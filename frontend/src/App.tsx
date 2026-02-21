@@ -181,20 +181,38 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const POLL_INTERVAL_MS = 3000
 const TERMINAL_STATUSES = new Set<JobStatus>(['indexed', 'failed'])
 
-const LANDING_STEPS = ['Добавьте материалы', 'Выберите цель', 'Получите курс и учитесь']
-const VALUE_CARDS = [
-  'План по шагам',
-  'Короткие уроки',
-  'Практика',
-  'Вопросы для самопроверки',
-  'Прогресс и повторение',
+const LANDING_STEPS = [
+  {
+    title: 'Добавьте материалы',
+    hint: 'PDF, DOCX, TXT, ссылка или заметки.',
+  },
+  {
+    title: 'Выберите цель',
+    hint: 'Один экран с ключевыми настройками.',
+  },
+  {
+    title: 'Учитесь по шагам',
+    hint: 'Короткие уроки, практика и прогресс.',
+  },
 ]
-const FOR_WHO = [
-  'Экзамены и зачеты',
-  'Новая тема для работы',
-  'Обучение команды',
-  'Курс для студентов и учеников',
+const LANDING_VISUAL_TILES = [
+  {
+    title: 'Курс за минуты',
+    note: 'Из заметок в структуру без ручной верстки плана.',
+    accent: 'mint',
+  },
+  {
+    title: 'Уроки по 15–30 минут',
+    note: 'Ритм, который легко держать каждый день.',
+    accent: 'sky',
+  },
+  {
+    title: 'Встроенная проверка',
+    note: '5 вопросов после урока, чтобы закрепить тему.',
+    accent: 'peach',
+  },
 ]
+const LANDING_PILLS = ['3 шага', 'Видимый прогресс', 'Подходит для личного и командного обучения']
 const EXAMPLE_COURSES = [
   'Подготовка к экзамену',
   'Введение в тему',
@@ -1792,13 +1810,11 @@ function App() {
       <GlassPanel className="hero-panel">
         <div className="hero-copy">
           <p className="eyebrow">Flowa</p>
-          <h1>Соберите курс из своих материалов.</h1>
+          <h1>Соберите учебный flow из своих материалов.</h1>
           <p className="hero-subtitle">
-            Документы, ссылки, заметки — Flowa превращает их в понятный путь обучения.
+            Добавьте файл, выберите цель и получите аккуратный маршрут: уроки, практика и видимый прогресс.
           </p>
-          <p className="hero-one-liner">
-            Flowa превращает ваши документы и ссылки в понятный курс с уроками, практикой и прогрессом.
-          </p>
+
           <div className="hero-actions">
             <LiquidButton
               variant="primary"
@@ -1811,121 +1827,78 @@ function App() {
               Посмотреть пример
             </LiquidButton>
           </div>
+
+          <div className="hero-pills">
+            {LANDING_PILLS.map((item) => (
+              <span className="hero-pill" key={item}>
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
 
-        <GlassCard className="hero-preview">
-          <div className="preview-grid">
-            <div>
-              <p className="preview-title">Модули</p>
-              <ul className="preview-list">
-                <li>1. Вход в тему</li>
-                <li>2. Практика на шагах</li>
-                <li>3. Закрепление</li>
-              </ul>
-            </div>
-            <div>
-              <p className="preview-title">Урок</p>
-              <p className="preview-lesson">Главное за 20 минут</p>
-              <p className="preview-note">Понятные акценты и короткий пример.</p>
+        <GlassCard className="hero-preview hero-preview-visual">
+          <div className="hero-bloom" aria-hidden>
+            <span className="hero-bloom-core" />
+            <span className="hero-bloom-leaf hero-bloom-leaf-a" />
+            <span className="hero-bloom-leaf hero-bloom-leaf-b" />
+            <span className="hero-bloom-leaf hero-bloom-leaf-c" />
+            <span className="hero-bloom-leaf hero-bloom-leaf-d" />
+          </div>
+
+          <div className="hero-preview-content">
+            <p className="preview-title">Flow дня</p>
+            <p className="preview-lesson">Курс за 3 шага</p>
+
+            <div className="mini-flow">
+              {LANDING_STEPS.map((step, index) => (
+                <div className="mini-flow-item" key={step.title}>
+                  <span className="mini-flow-index">{index + 1}</span>
+                  <div>
+                    <p>{step.title}</p>
+                    <p className="muted-text">{step.hint}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          <GlassCard className="mini-practice">Проверим понимание: 5 вопросов</GlassCard>
         </GlassCard>
       </GlassPanel>
 
       <GlassPanel className="section-panel">
-        <h2>Как это работает</h2>
-        <div className="grid-three">
-          {LANDING_STEPS.map((step) => (
-            <GlassCard key={step} className="feature-card">
-              <p>{step}</p>
+        <h2>Как устроен flow</h2>
+        <div className="flow-grid">
+          {LANDING_STEPS.map((step, index) => (
+            <GlassCard key={step.title} className="feature-card flow-step-card">
+              <p className="flow-step-number">{index + 1}</p>
+              <h3>{step.title}</h3>
+              <p>{step.hint}</p>
             </GlassCard>
           ))}
         </div>
       </GlassPanel>
 
       <GlassPanel className="section-panel">
-        <h2>Что вы получите</h2>
-        <div className="grid-three">
-          {VALUE_CARDS.map((card) => (
-            <GlassCard key={card} className="feature-card">
-              <p>{card}</p>
+        <h2>Минимум текста, максимум движения</h2>
+        <div className="visual-tiles">
+          {LANDING_VISUAL_TILES.map((tile) => (
+            <GlassCard
+              key={tile.title}
+              className={classNames('feature-card', 'visual-tile', `is-${tile.accent}`)}
+            >
+              <h3>{tile.title}</h3>
+              <p>{tile.note}</p>
             </GlassCard>
           ))}
-        </div>
-      </GlassPanel>
-
-      <GlassPanel className="section-panel">
-        <h2>Для кого</h2>
-        <div className="grid-two">
-          {FOR_WHO.map((item) => (
-            <GlassCard key={item} className="feature-card">
-              <p>{item}</p>
-            </GlassCard>
-          ))}
-        </div>
-      </GlassPanel>
-
-      <GlassPanel className="section-panel">
-        <h2>Примеры</h2>
-        <div className="grid-three">
-          {EXAMPLE_COURSES.map((item) => (
-            <GlassCard key={item} className="feature-card">
-              <p>{item}</p>
-            </GlassCard>
-          ))}
-        </div>
-      </GlassPanel>
-
-      <GlassPanel className="section-panel">
-        <h2>Тарифы</h2>
-        <div className="pricing-grid">
-          <GlassCard className="pricing-card">
-            <h3>Free</h3>
-            <p>До 2 курсов в месяц, базовый объем материалов.</p>
-            <p>Для личного старта.</p>
-          </GlassCard>
-          <GlassCard className="pricing-card is-highlighted">
-            <h3>Pro</h3>
-            <p>Больше курсов, больше материалов, экспорт и шаринг.</p>
-            <p>Для регулярного обучения.</p>
-          </GlassCard>
-          <GlassCard className="pricing-card">
-            <h3>Team</h3>
-            <p>Совместная работа, роли, общий доступ к курсам.</p>
-            <p>Для команд и учебных групп.</p>
-          </GlassCard>
-        </div>
-      </GlassPanel>
-
-      <GlassPanel className="section-panel">
-        <h2>FAQ</h2>
-        <div className="grid-two">
-          <GlassCard className="feature-card">
-            <h3>Можно ли начать с одного файла?</h3>
-            <p>Да, этого достаточно для старта.</p>
-          </GlassCard>
-          <GlassCard className="feature-card">
-            <h3>Можно ли изменить план?</h3>
-            <p>Да, шаги и уроки можно редактировать.</p>
-          </GlassCard>
-          <GlassCard className="feature-card">
-            <h3>Можно ли обновить курс, если материалы изменились?</h3>
-            <p>Да, добавьте новые материалы и обновите курс.</p>
-          </GlassCard>
-          <GlassCard className="feature-card">
-            <h3>Подходит ли для команды?</h3>
-            <p>Да, для этого есть Team-подход и отдельный Admin.</p>
-          </GlassCard>
         </div>
         <div className="final-cta">
-          <h3>Соберите курс. Учитесь по шагам.</h3>
+          <h3>Откройте Flowa и начните с первого шага.</h3>
           <LiquidButton
             variant="primary"
             type="button"
             onClick={() => navigate(token ? '/app/new' : '/signup')}
           >
-            Создать курс
+            На старт
           </LiquidButton>
         </div>
       </GlassPanel>
@@ -1936,23 +1909,33 @@ function App() {
     <div className="page-stack">
       <GlassPanel className="section-panel">
         <h1>Примеры курсов</h1>
-        <p className="muted-text">Готовые форматы, которые легко адаптировать под вашу тему.</p>
+        <p className="muted-text">Форматы, которые можно запустить за пару минут.</p>
       </GlassPanel>
       <div className="grid-three">
-        {EXAMPLE_COURSES.map((item) => (
-          <GlassCard className="feature-card" key={item}>
+        {EXAMPLE_COURSES.map((item, index) => (
+          <GlassCard
+            className={classNames(
+              'feature-card',
+              'visual-tile',
+              index % 3 === 0 ? 'is-mint' : index % 3 === 1 ? 'is-sky' : 'is-peach',
+            )}
+            key={item}
+          >
             <h3>{item}</h3>
-            <p>Короткие уроки, практика и видимый прогресс.</p>
+            <p>Короткие уроки, практика и понятный прогресс.</p>
           </GlassCard>
         ))}
       </div>
-      <GlassPanel className="section-panel">
+      <GlassPanel className="section-panel compact-cta-panel">
         <LiquidButton
           variant="primary"
           type="button"
           onClick={() => navigate(token ? '/app/new' : '/signup')}
         >
           Создать свой курс
+        </LiquidButton>
+        <LiquidButton variant="ghost" type="button" onClick={() => navigate('/pricing')}>
+          Посмотреть тарифы
         </LiquidButton>
       </GlassPanel>
     </div>
@@ -1962,32 +1945,37 @@ function App() {
     <div className="page-stack">
       <GlassPanel className="section-panel">
         <h1>Тарифы Flowa</h1>
-        <p className="muted-text">Выберите темп и объем, которые подходят вашему формату обучения.</p>
+        <p className="muted-text">Три плана без перегрузки. Можно изменить в любой момент.</p>
       </GlassPanel>
       <div className="pricing-grid">
         <GlassCard className="pricing-card">
           <h3>Free</h3>
-          <ul className="plain-list">
-            <li>2 курса в месяц</li>
-            <li>Стартовый объем материалов</li>
-            <li>Базовый прогресс</li>
-          </ul>
+          <p>Для старта и личных мини-курсов.</p>
+          <LiquidButton variant="ghost" type="button" onClick={() => navigate(token ? '/app/new' : '/signup')}>
+            Начать бесплатно
+          </LiquidButton>
         </GlassCard>
         <GlassCard className="pricing-card is-highlighted">
           <h3>Pro</h3>
-          <ul className="plain-list">
-            <li>До 20 курсов в месяц</li>
-            <li>Расширенный объем материалов</li>
-            <li>Экспорт и шаринг</li>
-          </ul>
+          <p>Для регулярного обучения и более глубоких курсов.</p>
+          <LiquidButton
+            variant="primary"
+            type="button"
+            onClick={() => navigate(token ? '/billing' : '/signup')}
+          >
+            Выбрать Pro
+          </LiquidButton>
         </GlassCard>
         <GlassCard className="pricing-card">
           <h3>Team</h3>
-          <ul className="plain-list">
-            <li>Командный доступ</li>
-            <li>Совместная работа</li>
-            <li>Расширенная отчетность</li>
-          </ul>
+          <p>Для команд, наставников и учебных групп.</p>
+          <LiquidButton
+            variant="secondary"
+            type="button"
+            onClick={() => navigate(token ? '/billing' : '/signup')}
+          >
+            Подключить Team
+          </LiquidButton>
         </GlassCard>
       </div>
     </div>
@@ -1997,21 +1985,20 @@ function App() {
     <div className="page-stack">
       <GlassPanel className="section-panel">
         <h1>О Flowa</h1>
-        <p>Flowa = Flow + Flower.</p>
-        <p className="muted-text">Знания распускаются из ваших материалов.</p>
+        <p className="muted-text">Flowa = Flow + Flower. Мы делаем обучение спокойным и последовательным.</p>
       </GlassPanel>
       <GlassPanel className="section-panel">
         <h2>Ценности</h2>
-        <div className="grid-three">
-          <GlassCard className="feature-card">
+        <div className="visual-tiles">
+          <GlassCard className="feature-card visual-tile is-mint">
             <h3>Ясность</h3>
             <p>Каждый шаг понятен с первого экрана.</p>
           </GlassCard>
-          <GlassCard className="feature-card">
+          <GlassCard className="feature-card visual-tile is-sky">
             <h3>Темп</h3>
             <p>Короткие сессии и плавный рост навыка.</p>
           </GlassCard>
-          <GlassCard className="feature-card">
+          <GlassCard className="feature-card visual-tile is-peach">
             <h3>Практика</h3>
             <p>Проверка понимания внутри учебного пути.</p>
           </GlassCard>
@@ -2024,26 +2011,35 @@ function App() {
     <div className="page-stack">
       <GlassPanel className="section-panel">
         <h1>Помощь</h1>
-        <p className="muted-text">Короткие ответы на частые вопросы.</p>
+        <p className="muted-text">Самые частые вопросы и быстрые действия.</p>
       </GlassPanel>
       <div className="grid-two">
-        <GlassCard className="feature-card">
+        <GlassCard className="feature-card visual-tile is-mint">
           <h3>Как быстро начать?</h3>
-          <p>Зарегистрируйтесь, добавьте файл и перейдите в мастер курса.</p>
+          <p>Создайте аккаунт, загрузите файл и перейдите в мастер курса.</p>
         </GlassCard>
-        <GlassCard className="feature-card">
+        <GlassCard className="feature-card visual-tile is-sky">
           <h3>Как продолжить с того же места?</h3>
           <p>Войдите в аккаунт и откройте библиотеку курсов.</p>
         </GlassCard>
-        <GlassCard className="feature-card">
+        <GlassCard className="feature-card visual-tile is-peach">
           <h3>Можно ли менять план после создания?</h3>
           <p>Да, шаги и уроки можно уточнять под задачу.</p>
         </GlassCard>
-        <GlassCard className="feature-card">
+        <GlassCard className="feature-card visual-tile is-mint">
           <h3>Что делать при ошибке?</h3>
           <p>Нажмите «Попробовать снова» или загрузите материал повторно.</p>
         </GlassCard>
       </div>
+      <GlassPanel className="section-panel compact-cta-panel">
+        <LiquidButton
+          variant="primary"
+          type="button"
+          onClick={() => navigate(token ? '/app/new' : '/signup')}
+        >
+          Перейти к созданию курса
+        </LiquidButton>
+      </GlassPanel>
     </div>
   )
 
@@ -2306,7 +2302,12 @@ function App() {
               >
                 Назад
               </LiquidButton>
-              <LiquidButton variant="primary" type="button" onClick={handleBuildPlan}>
+              <LiquidButton
+                variant="primary"
+                type="button"
+                onClick={handleBuildPlan}
+                disabled={readySourceIds.size === 0}
+              >
                 Собрать план
               </LiquidButton>
             </div>
@@ -2581,7 +2582,12 @@ function App() {
               >
                 Назад
               </LiquidButton>
-              <LiquidButton variant="primary" type="button" onClick={() => void handleCreateCourse()} disabled={isCreatingCourse}>
+              <LiquidButton
+                variant="primary"
+                type="button"
+                onClick={() => void handleCreateCourse()}
+                disabled={isCreatingCourse || !wizard.selectedSourceId}
+              >
                 {isCreatingCourse ? 'Создаем курс...' : 'Создать курс'}
               </LiquidButton>
             </div>
@@ -3194,6 +3200,14 @@ function App() {
           <button className="admin-brand" type="button" onClick={() => navigate('/admin')}>
             Flowa Admin
           </button>
+          <div className="admin-shortcuts">
+            <LiquidButton variant="secondary" compact type="button" onClick={() => navigate('/app')}>
+              В кабинет
+            </LiquidButton>
+            <LiquidButton variant="ghost" compact type="button" onClick={() => navigate('/')}>
+              На главную
+            </LiquidButton>
+          </div>
           <nav className="admin-nav">
             {ADMIN_SECTIONS.map((item) => (
               <button
@@ -3344,6 +3358,13 @@ function App() {
               Тарифы
             </button>
             <button
+              className={classNames('nav-link', route.kind === 'about' && 'is-active')}
+              type="button"
+              onClick={() => navigate('/about')}
+            >
+              О Flowa
+            </button>
+            <button
               className={classNames('nav-link', route.kind === 'help' && 'is-active')}
               type="button"
               onClick={() => navigate('/help')}
@@ -3432,7 +3453,7 @@ function App() {
           <div className="topbar-actions">
             <ThemeLatchButton theme={theme} onToggle={toggleTheme} />
             <LiquidButton variant="ghost" compact type="button" onClick={() => navigate('/')}>
-              Лендинг
+              На главную
             </LiquidButton>
             <LiquidButton variant="secondary" compact type="button" onClick={() => void handleLogout()}>
               Выйти
@@ -3533,7 +3554,9 @@ const WizardStepMaterials = ({
   return (
     <GlassPanel className="section-panel wizard-step">
       <h2>Шаг 1. Добавьте материалы</h2>
-      <p className="muted-text">Файлы, ссылки или текст. Все материалы отображаются в общем списке.</p>
+      <p className="muted-text">
+        Файлы, ссылки или текст. Для сборки курса нужен хотя бы один обработанный файл со статусом «готово».
+      </p>
 
       <div className="form-grid-two">
         <GlassCard>
@@ -3650,7 +3673,7 @@ const WizardStepMaterials = ({
       </GlassCard>
 
       <div className="row-wrap">
-        <LiquidButton variant="primary" type="button" onClick={onNext}>
+        <LiquidButton variant="primary" type="button" onClick={onNext} disabled={materials.length === 0}>
           Дальше
         </LiquidButton>
       </div>

@@ -5,51 +5,51 @@
   --font-display: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
   --font-body: 'Manrope', 'Avenir', 'Segoe UI', sans-serif;
 
-  --bg-0: #0a101c;
-  --bg-1: #111b2d;
-  --bg-2: #151d36;
-  --bg-3: #1e2643;
+  --bg-0: #07161b;
+  --bg-1: #0d2028;
+  --bg-2: #132a36;
+  --bg-3: #1a3543;
 
-  --ink: #f4f8ff;
-  --ink-soft: #c1cce2;
-  --ink-muted: #93a1c4;
+  --ink: #f3fbff;
+  --ink-soft: #c1d5df;
+  --ink-muted: #95afbb;
 
-  --glass: rgba(252, 252, 255, 0.1);
-  --glass-strong: rgba(250, 252, 255, 0.16);
-  --glass-edge: rgba(255, 255, 255, 0.22);
+  --glass: rgba(247, 253, 255, 0.1);
+  --glass-strong: rgba(247, 253, 255, 0.17);
+  --glass-edge: rgba(209, 231, 243, 0.26);
 
-  --bloom-start: rgba(124, 243, 214, 0.78);
-  --bloom-mid: rgba(205, 157, 243, 0.76);
-  --bloom-end: rgba(255, 165, 205, 0.75);
+  --bloom-start: rgba(122, 228, 187, 0.84);
+  --bloom-mid: rgba(130, 210, 235, 0.8);
+  --bloom-end: rgba(243, 186, 140, 0.76);
 
-  --success: #79d9b7;
-  --warning: #efc577;
-  --error: #e98a9e;
-  --neutral: #aec7ff;
+  --success: #7fdfba;
+  --warning: #efc683;
+  --error: #ea9a9f;
+  --neutral: #9bd3ef;
 
-  --shadow-soft: 0 26px 48px rgba(7, 12, 26, 0.38);
-  --shadow-hard: 0 20px 40px rgba(2, 8, 18, 0.5);
-  --halo: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 32px rgba(159, 214, 255, 0.2);
+  --shadow-soft: 0 18px 34px rgba(5, 16, 22, 0.3);
+  --shadow-hard: 0 12px 24px rgba(5, 16, 22, 0.35);
+  --halo: 0 0 0 1px rgba(195, 221, 233, 0.22), 0 0 24px rgba(124, 210, 205, 0.24);
 }
 
 :root[data-theme='light'] {
   color-scheme: light;
-  --bg-0: #eef4ff;
-  --bg-1: #e8f0ff;
-  --bg-2: #dde8fd;
-  --bg-3: #d6e1f8;
+  --bg-0: #f3fbf9;
+  --bg-1: #edf7f5;
+  --bg-2: #e6f2f4;
+  --bg-3: #dce9ef;
 
-  --ink: #152037;
-  --ink-soft: #324262;
-  --ink-muted: #5b6d91;
+  --ink: #16303a;
+  --ink-soft: #38505c;
+  --ink-muted: #607884;
 
-  --glass: rgba(255, 255, 255, 0.58);
-  --glass-strong: rgba(255, 255, 255, 0.72);
-  --glass-edge: rgba(123, 154, 202, 0.4);
+  --glass: rgba(255, 255, 255, 0.6);
+  --glass-strong: rgba(255, 255, 255, 0.75);
+  --glass-edge: rgba(118, 161, 176, 0.36);
 
-  --shadow-soft: 0 20px 42px rgba(50, 75, 120, 0.14);
-  --shadow-hard: 0 16px 34px rgba(47, 70, 112, 0.2);
-  --halo: 0 0 0 1px rgba(188, 210, 243, 0.6), 0 0 28px rgba(142, 193, 245, 0.35);
+  --shadow-soft: 0 14px 30px rgba(69, 111, 123, 0.14);
+  --shadow-hard: 0 10px 22px rgba(69, 111, 123, 0.2);
+  --halo: 0 0 0 1px rgba(172, 214, 206, 0.7), 0 0 22px rgba(152, 214, 197, 0.32);
 }
 
 * {
@@ -67,9 +67,9 @@ body {
   font-family: var(--font-body);
   color: var(--ink);
   background:
-    radial-gradient(64% 44% at 6% -4%, rgba(122, 201, 255, 0.23), transparent 72%),
-    radial-gradient(58% 40% at 94% -5%, rgba(233, 162, 208, 0.19), transparent 72%),
-    radial-gradient(70% 54% at 50% 104%, rgba(123, 238, 212, 0.12), transparent 74%),
+    radial-gradient(62% 44% at 6% -4%, rgba(122, 206, 236, 0.24), transparent 72%),
+    radial-gradient(56% 40% at 94% -5%, rgba(241, 189, 152, 0.2), transparent 72%),
+    radial-gradient(70% 54% at 50% 104%, rgba(128, 226, 192, 0.16), transparent 74%),
     linear-gradient(155deg, var(--bg-0), var(--bg-1), var(--bg-2), var(--bg-3));
   padding: clamp(0.9rem, 2vw, 1.4rem);
   overflow-x: hidden;
@@ -96,5 +96,5 @@ textarea {
 }
 
 ::selection {
-  background: rgba(137, 196, 255, 0.4);
+  background: rgba(141, 220, 194, 0.4);
 }

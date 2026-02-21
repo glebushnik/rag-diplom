@@ -59,3 +59,9 @@ Tables:
 - Set `EMBEDDING_PROVIDER=local|api`.
 - Set `LLM_PROVIDER=local|api`.
 - When API provider URLs are empty, services use local fallback behavior.
+
+## Frontend UX update
+- Обновлен минималистичный стиль Flowa с акцентом на palette `mint/sky/peach`.
+- Лэндинг упрощен: меньше текста, больше визуального flow и коротких CTA.
+- В app-шапке кнопка `Лендинг` заменена на `На главную`.
+- В админке добавлены быстрые переходы `В кабинет` и `На главную` (возврат из `/admin`).
