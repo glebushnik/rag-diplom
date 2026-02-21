@@ -1,20 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap');
 
 :root {
-  --ink: #eaf2ff;
-  --ink-muted: #b2bed3;
-  --surface: rgba(23, 35, 58, 0.52);
-  --surface-strong: rgba(18, 29, 50, 0.72);
-  --line: rgba(184, 220, 255, 0.25);
-  --line-strong: rgba(184, 220, 255, 0.44);
-  --accent: #8df9f5;
-  --accent-strong: #5ac7ff;
-  --danger: #ff7f8d;
-  font-family: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+  --font-display: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope', 'Avenir', 'Segoe UI', sans-serif;
+
+  --bg-0: #0a101c;
+  --bg-1: #111b2d;
+  --bg-2: #151d36;
+  --bg-3: #1e2643;
+
+  --ink: #f4f8ff;
+  --ink-soft: #c1cce2;
+  --ink-muted: #93a1c4;
+
+  --glass: rgba(252, 252, 255, 0.1);
+  --glass-strong: rgba(250, 252, 255, 0.16);
+  --glass-edge: rgba(255, 255, 255, 0.22);
+
+  --bloom-start: rgba(124, 243, 214, 0.78);
+  --bloom-mid: rgba(205, 157, 243, 0.76);
+  --bloom-end: rgba(255, 165, 205, 0.75);
+
+  --success: #79d9b7;
+  --warning: #efc577;
+  --error: #e98a9e;
+  --neutral: #aec7ff;
+
+  --shadow-soft: 0 26px 48px rgba(7, 12, 26, 0.38);
+  --shadow-hard: 0 20px 40px rgba(2, 8, 18, 0.5);
+  --halo: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 32px rgba(159, 214, 255, 0.2);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg-0: #eef4ff;
+  --bg-1: #e8f0ff;
+  --bg-2: #dde8fd;
+  --bg-3: #d6e1f8;
+
+  --ink: #152037;
+  --ink-soft: #324262;
+  --ink-muted: #5b6d91;
+
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-strong: rgba(255, 255, 255, 0.72);
+  --glass-edge: rgba(123, 154, 202, 0.4);
+
+  --shadow-soft: 0 20px 42px rgba(50, 75, 120, 0.14);
+  --shadow-hard: 0 16px 34px rgba(47, 70, 112, 0.2);
+  --halo: 0 0 0 1px rgba(188, 210, 243, 0.6), 0 0 28px rgba(142, 193, 245, 0.35);
 }
 
 * {
@@ -29,92 +64,37 @@ body,
 }
 
 body {
-  min-height: 100vh;
-  padding: 1.5rem;
+  font-family: var(--font-body);
   color: var(--ink);
   background:
-    radial-gradient(50% 40% at 10% 10%, rgba(119, 221, 255, 0.3), transparent 70%),
-    radial-gradient(55% 60% at 85% 12%, rgba(126, 155, 255, 0.26), transparent 68%),
-    radial-gradient(50% 58% at 60% 82%, rgba(86, 173, 187, 0.24), transparent 72%),
-    linear-gradient(145deg, #0b121f 0%, #111d32 52%, #172943 100%);
+    radial-gradient(64% 44% at 6% -4%, rgba(122, 201, 255, 0.23), transparent 72%),
+    radial-gradient(58% 40% at 94% -5%, rgba(233, 162, 208, 0.19), transparent 72%),
+    radial-gradient(70% 54% at 50% 104%, rgba(123, 238, 212, 0.12), transparent 74%),
+    linear-gradient(155deg, var(--bg-0), var(--bg-1), var(--bg-2), var(--bg-3));
+  padding: clamp(0.9rem, 2vw, 1.4rem);
   overflow-x: hidden;
-}
-
-body::before,
-body::after {
-  content: '';
-  position: fixed;
-  pointer-events: none;
-  border-radius: 999px;
-  filter: blur(42px);
-  opacity: 0.65;
-}
-
-body::before {
-  width: 240px;
-  height: 240px;
-  top: 5vh;
-  left: 6vw;
-  background: rgba(146, 255, 244, 0.24);
-  animation: drift 11s ease-in-out infinite;
-}
-
-body::after {
-  width: 300px;
-  height: 300px;
-  right: 4vw;
-  bottom: 6vh;
-  background: rgba(117, 152, 255, 0.24);
-  animation: drift 15s ease-in-out infinite reverse;
-}
-
-input,
-button,
-select,
-textarea {
-  font: inherit;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
 h2,
 h3,
 h4,
-p {
+p,
+ul,
+ol {
   margin: 0;
 }
 
-.fade-in {
-  animation: fade-in 420ms ease-out both;
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes drift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-
-  50% {
-    transform: translate3d(12px, -16px, 0);
-  }
-
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@media (max-width: 900px) {
-  body {
-    padding: 1rem;
-  }
+::selection {
+  background: rgba(137, 196, 255, 0.4);
 }

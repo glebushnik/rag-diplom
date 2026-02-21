@@ -11,12 +11,31 @@ interface SourcesPanelProps {
   message: string | null
 }
 
+const MAX_FILE_SIZE_MB = 30
+const MAX_FILE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+
 const STATUS_LABELS: Record<JobStatus, string> = {
-  queued: 'Queued',
-  processing: 'Processing',
-  embedded: 'Embedded',
-  indexed: 'Indexed',
-  failed: 'Failed',
+  queued: 'В очереди',
+  processing: 'В обработке',
+  embedded: 'Векторизация',
+  indexed: 'Готово',
+  failed: 'Ошибка',
+}
+
+const STATUS_HINTS: Record<JobStatus, string> = {
+  queued: 'Файл добавлен в очередь и скоро начнет обрабатываться.',
+  processing: 'Система анализирует содержимое документа.',
+  embedded: 'Материал разбит на части и подготовлен для поиска.',
+  indexed: 'Источник готов. Можно собирать курс.',
+  failed: 'Обработка завершилась с ошибкой. Проверьте файл и попробуйте снова.',
+}
+
+const formatSize = (value: number): string => {
+  if (value < 1024 * 1024) {
+    return `${Math.ceil(value / 1024)} КБ`
+  }
+
+  return `${(value / (1024 * 1024)).toFixed(1)} МБ`
 }
 
 export const SourcesPanel = ({
@@ -35,6 +54,7 @@ export const SourcesPanel = ({
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(event.target.files?.[0] ?? null)
+    setErrorMessage(null)
   }
 
   const handleUpload = async (event: FormEvent<HTMLFormElement>) => {
@@ -42,7 +62,12 @@ export const SourcesPanel = ({
     setErrorMessage(null)
 
     if (!selectedFile) {
-      setErrorMessage('Select a file before uploading.')
+      setErrorMessage('Сначала выберите файл для загрузки.')
+      return
+    }
+
+    if (selectedFile.size > MAX_FILE_BYTES) {
+      setErrorMessage(`Размер файла не должен превышать ${MAX_FILE_SIZE_MB} МБ.`)
       return
     }
 
@@ -54,21 +79,25 @@ export const SourcesPanel = ({
         fileInputRef.current.value = ''
       }
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Upload failed.')
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Не удалось загрузить источник. Попробуйте снова.',
+      )
     }
   }
 
   return (
     <section className="glass-panel content-panel fade-in">
       <header className="section-header">
-        <h2>Sources</h2>
-        <p className="muted-text">Upload документ и дождитесь статуса job = indexed.</p>
+        <h2>Шаг 1. Добавьте учебный материал</h2>
+        <p className="muted-text">
+          Загрузите документ. Когда статус станет «Готово», можно переходить к сборке курса.
+        </p>
       </header>
 
       <form className="form" onSubmit={handleUpload}>
         <div className="field-grid">
           <label className="field">
-            <span>Document</span>
+            <span>Файл</span>
             <input
               ref={fileInputRef}
               className="control"
@@ -79,31 +108,47 @@ export const SourcesPanel = ({
           </label>
 
           <label className="field">
-            <span>Type</span>
+            <span>Тип материала</span>
             <select
               className="control"
               value={sourceType}
               onChange={(event) => setSourceType(event.target.value)}
             >
-              <option value="document">document</option>
-              <option value="url">url</option>
-              <option value="notes">notes</option>
+              <option value="document">Документ</option>
+              <option value="url">Веб-страница</option>
+              <option value="notes">Заметки</option>
             </select>
           </label>
         </div>
 
-        {errorMessage ? <p className="inline-error">{errorMessage}</p> : null}
+        {selectedFile ? (
+          <p className="muted-text">
+            Выбран файл: {selectedFile.name} ({formatSize(selectedFile.size)})
+          </p>
+        ) : null}
+
+        {errorMessage ? (
+          <p className="form-message form-message-error validation-pop" role="alert">
+            {errorMessage}
+          </p>
+        ) : null}
 
         <button className="btn btn-primary" type="submit" disabled={isUploading}>
-          {isUploading ? 'Uploading...' : 'Upload Source'}
+          {isUploading ? 'Загружаем материал...' : 'Загрузить материал'}
         </button>
       </form>
 
-      {message ? <p className="inline-info">{message}</p> : null}
+      {message ? (
+        <p className="form-message form-message-success" role="status">
+          {message}
+        </p>
+      ) : null}
 
       <div className="source-list">
         {sources.length === 0 ? (
-          <p className="muted-text">Sources not uploaded yet.</p>
+          <p className="muted-text">
+            Пока нет загруженных материалов. Добавьте первый документ, чтобы начать.
+          </p>
         ) : (
           sources.map((source) => {
             const jobStatus = source.job?.status ?? source.status
@@ -116,13 +161,15 @@ export const SourcesPanel = ({
               >
                 <div className="source-item-main">
                   <p className="source-name">{source.name}</p>
-                  <p className="source-meta">{source.id}</p>
+                  <p className="source-meta">Тип: {source.type}</p>
                   <div className="row source-status-row">
                     <span className={statusClassName}>{STATUS_LABELS[jobStatus]}</span>
-                    <span className="muted-text">job: {jobStatus}</span>
+                    <span className="muted-text">{STATUS_HINTS[jobStatus]}</span>
                   </div>
                   {source.job?.error ? (
-                    <p className="inline-error">Job error: {source.job.error}</p>
+                    <p className="form-message form-message-error validation-pop">
+                      Подробности ошибки: {source.job.error}
+                    </p>
                   ) : null}
                 </div>
 
@@ -132,14 +179,14 @@ export const SourcesPanel = ({
                     type="button"
                     onClick={() => onSelectSource(source.id)}
                   >
-                    Use Source
+                    {selectedSourceId === source.id ? 'Выбрано' : 'Выбрать для курса'}
                   </button>
                   <button
                     className="btn btn-ghost"
                     type="button"
-                    onClick={() => onRefresh(source.id)}
+                    onClick={() => void onRefresh(source.id)}
                   >
-                    Refresh
+                    Проверить статус
                   </button>
                 </div>
               </article>

@@ -8,9 +8,23 @@ interface CourseBuilderPanelProps {
   isSubmitting: boolean
 }
 
-const LEVEL_OPTIONS: CourseLevel[] = ['beginner', 'intermediate', 'advanced']
-
-type ProviderOption = 'default' | 'local' | 'api'
+const LEVEL_OPTIONS: Array<{ value: CourseLevel; label: string; description: string }> = [
+  {
+    value: 'beginner',
+    label: 'Начальный',
+    description: 'Для тех, кто только знакомится с темой.',
+  },
+  {
+    value: 'intermediate',
+    label: 'Средний',
+    description: 'Для слушателей с базовой подготовкой.',
+  },
+  {
+    value: 'advanced',
+    label: 'Продвинутый',
+    description: 'Для глубокой практики и сложных кейсов.',
+  },
+]
 
 export const CourseBuilderPanel = ({
   availableSources,
@@ -27,7 +41,6 @@ export const CourseBuilderPanel = ({
   const [title, setTitle] = useState('')
   const [goal, setGoal] = useState('')
   const [level, setLevel] = useState<CourseLevel>('beginner')
-  const [providerOverride, setProviderOverride] = useState<ProviderOption>('default')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
@@ -43,18 +56,31 @@ export const CourseBuilderPanel = ({
     return indexedSources[0]?.id ?? ''
   }, [indexedSources, preferredSourceId, sourceId])
 
+  const validate = (): string | null => {
+    if (!resolvedSourceId) {
+      return 'Сначала подготовьте хотя бы один источник со статусом «Готово».'
+    }
+
+    if (title.trim().length < 4) {
+      return 'Название курса должно быть не короче 4 символов.'
+    }
+
+    if (goal.trim().length < 12) {
+      return 'Опишите цель подробнее (минимум 12 символов).'
+    }
+
+    return null
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setErrorMessage(null)
     setSuccessMessage(null)
 
-    if (!resolvedSourceId) {
-      setErrorMessage('Choose an indexed source before creating a course.')
-      return
-    }
+    const validationError = validate()
 
-    if (goal.trim().length < 8) {
-      setErrorMessage('Goal must be at least 8 characters long.')
+    if (validationError) {
+      setErrorMessage(validationError)
       return
     }
 
@@ -65,108 +91,106 @@ export const CourseBuilderPanel = ({
       level,
     }
 
-    if (providerOverride !== 'default') {
-      payload.provider_override = providerOverride
-    }
-
     try {
       await onCreateCourse(payload)
-      setSuccessMessage('Course has been created. Open Course Viewer tab.')
+      setSuccessMessage('Курс успешно создан. Перейдите во вкладку «Готовый курс».')
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Course creation failed.')
+      setErrorMessage(error instanceof Error ? error.message : 'Не удалось создать курс.')
     }
   }
 
   return (
     <section className="glass-panel content-panel fade-in">
       <header className="section-header">
-        <h2>Course Builder</h2>
-        <p className="muted-text">Цель, уровень и источник для генерации структуры курса.</p>
+        <h2>Шаг 2. Сформируйте курс</h2>
+        <p className="muted-text">
+          Опишите, чему должен научиться слушатель. Платформа соберет структуру автоматически.
+        </p>
       </header>
 
       {indexedSources.length === 0 ? (
-        <p className="inline-error">No indexed sources available yet.</p>
+        <p className="form-message form-message-error validation-pop" role="alert">
+          Пока нет готовых источников. Вернитесь на первый шаг и дождитесь завершения обработки.
+        </p>
       ) : null}
 
       <form className="form" onSubmit={handleSubmit}>
         <div className="field-grid">
           <label className="field">
-            <span>Indexed Source</span>
+            <span>Источник для курса</span>
             <select
               className="control"
               value={resolvedSourceId}
               onChange={(event) => setSourceId(event.target.value)}
               disabled={indexedSources.length === 0}
             >
-              <option value="">Select source</option>
+              <option value="">Выберите источник</option>
               {indexedSources.map((source) => (
                 <option key={source.id} value={source.id}>
-                  {source.name} ({source.id.slice(0, 8)})
+                  {source.name}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="field">
-            <span>Level</span>
+            <span>Уровень сложности</span>
             <select
               className="control"
               value={level}
               onChange={(event) => setLevel(event.target.value as CourseLevel)}
             >
               {LEVEL_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
-          </label>
-
-          <label className="field">
-            <span>Provider Override</span>
-            <select
-              className="control"
-              value={providerOverride}
-              onChange={(event) => setProviderOverride(event.target.value as ProviderOption)}
-            >
-              <option value="default">default</option>
-              <option value="local">local</option>
-              <option value="api">api</option>
-            </select>
+            <small className="muted-text">
+              {LEVEL_OPTIONS.find((option) => option.value === level)?.description}
+            </small>
           </label>
         </div>
 
         <label className="field">
-          <span>Course Title</span>
+          <span>Название курса</span>
           <input
             required
             className="control"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Курс по ML"
+            placeholder="Например: Основы машинного обучения"
           />
         </label>
 
         <label className="field">
-          <span>Goal</span>
+          <span>Цель курса</span>
           <textarea
             required
             className="control control-textarea"
             value={goal}
             onChange={(event) => setGoal(event.target.value)}
-            placeholder="Освоить основы машинного обучения и уметь строить MVP-модели"
+            placeholder="Например: Освоить базовые подходы и научиться строить рабочие модели для практических задач."
           />
         </label>
 
-        {errorMessage ? <p className="inline-error">{errorMessage}</p> : null}
-        {successMessage ? <p className="inline-info">{successMessage}</p> : null}
+        {errorMessage ? (
+          <p className="form-message form-message-error validation-pop" role="alert">
+            {errorMessage}
+          </p>
+        ) : null}
+        {successMessage ? (
+          <p className="form-message form-message-success" role="status">
+            {successMessage}
+          </p>
+        ) : null}
 
         <button
           className="btn btn-primary"
           type="submit"
           disabled={isSubmitting || indexedSources.length === 0}
         >
-          {isSubmitting ? 'Creating...' : 'Create Course'}
+          {isSubmitting ? 'Собираем структуру курса...' : 'Сгенерировать курс'}
         </button>
       </form>
     </section>
