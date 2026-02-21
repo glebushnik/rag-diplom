@@ -1,0 +1,156 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rag-net
+
+  parser-ocr:
+    build:
+      context: ./parser-ocr
+    container_name: parser-ocr
+    environment:
+      TESSERACT_LANG: ${TESSERACT_LANG}
+    ports:
+      - "8001:8000"
+    networks:
+      - rag-net
+
+  embedding:
+    build:
+      context: ./embedding
+    container_name: embedding
+    environment:
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER}
+      EMBEDDING_DIM: ${EMBEDDING_DIM}
+      EMBEDDING_API_URL: ${EMBEDDING_API_URL}
+    ports:
+      - "8002:8000"
+    networks:
+      - rag-net
+
+  retrieval:
+    build:
+      context: ./retrieval
+    container_name: retrieval
+    environment:
+      FAISS_DATA_DIR: /data/faiss
+      EMBEDDING_URL: http://embedding:8000
+    volumes:
+      - faiss-data:/data/faiss
+    depends_on:
+      - embedding
+    ports:
+      - "8003:8000"
+    networks:
+      - rag-net
+
+  course-builder:
+    build:
+      context: ./course-builder
+    container_name: course-builder
+    environment:
+      POSTGRES_URL: ${POSTGRES_URL}
+      RETRIEVAL_URL: http://retrieval:8000
+      LLM_PROVIDER: ${LLM_PROVIDER}
+      LLM_API_URL: ${LLM_API_URL}
+      COURSE_TOP_K: ${COURSE_TOP_K}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      retrieval:
+        condition: service_started
+    ports:
+      - "8004:8000"
+    networks:
+      - rag-net
+
+  ingestion-java:
+    build:
+      context: ./ingestion-java
+    container_name: ingestion-java
+    environment:
+      POSTGRES_JDBC_URL: ${POSTGRES_JDBC_URL}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PARSER_URL: http://parser-ocr:8000
+      EMBEDDING_URL: http://embedding:8000
+      RETRIEVAL_URL: http://retrieval:8000
+      RAW_STORAGE_DIR: /data/raw
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+    volumes:
+      - raw-data:/data/raw
+    depends_on:
+      postgres:
+        condition: service_healthy
+      parser-ocr:
+        condition: service_started
+      embedding:
+        condition: service_started
+      retrieval:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    networks:
+      - rag-net
+
+  gateway:
+    build:
+      context: ./gateway
+    container_name: gateway
+    environment:
+      POSTGRES_URL: ${POSTGRES_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
+      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES}
+      INGESTION_URL: http://ingestion-java:8080
+      COURSE_BUILDER_URL: http://course-builder:8000
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ingestion-java:
+        condition: service_started
+      course-builder:
+        condition: service_started
+    ports:
+      - "8000:8000"
+    networks:
+      - rag-net
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_GATEWAY_URL: ${VITE_GATEWAY_URL:-/}
+    container_name: frontend
+    depends_on:
+      gateway:
+        condition: service_started
+    ports:
+      - "3000:80"
+    networks:
+      - rag-net
+
+volumes:
+  postgres-data:
+  faiss-data:
+  raw-data:
+
+networks:
+  rag-net:
+    name: rag-net

@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@400;500;600;700&display=swap');
+
+:root {
+  --ink: #eaf2ff;
+  --ink-muted: #b2bed3;
+  --surface: rgba(23, 35, 58, 0.52);
+  --surface-strong: rgba(18, 29, 50, 0.72);
+  --line: rgba(184, 220, 255, 0.25);
+  --line-strong: rgba(184, 220, 255, 0.44);
+  --accent: #8df9f5;
+  --accent-strong: #5ac7ff;
+  --danger: #ff7f8d;
+  font-family: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  padding: 1.5rem;
+  color: var(--ink);
+  background:
+    radial-gradient(50% 40% at 10% 10%, rgba(119, 221, 255, 0.3), transparent 70%),
+    radial-gradient(55% 60% at 85% 12%, rgba(126, 155, 255, 0.26), transparent 68%),
+    radial-gradient(50% 58% at 60% 82%, rgba(86, 173, 187, 0.24), transparent 72%),
+    linear-gradient(145deg, #0b121f 0%, #111d32 52%, #172943 100%);
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  border-radius: 999px;
+  filter: blur(42px);
+  opacity: 0.65;
+}
+
+body::before {
+  width: 240px;
+  height: 240px;
+  top: 5vh;
+  left: 6vw;
+  background: rgba(146, 255, 244, 0.24);
+  animation: drift 11s ease-in-out infinite;
+}
+
+body::after {
+  width: 300px;
+  height: 300px;
+  right: 4vw;
+  bottom: 6vh;
+  background: rgba(117, 152, 255, 0.24);
+  animation: drift 15s ease-in-out infinite reverse;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+.fade-in {
+  animation: fade-in 420ms ease-out both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(12px, -16px, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 900px) {
+  body {
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.env
+*.log
+
+# Python venv/cache
+.venv/
+.pytest_cache/
+
+# Java
+ingestion-java/target/
+
+# Runtime data
+postgres-data/
+faiss-data/
+raw-data/
